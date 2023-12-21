@@ -1,0 +1,23 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(#F97794,#623AA2) no-repeat ;
+    height: 100vh;
+}
+.btn-menu-page button{
+    margin: 10px 20px;
+    height: 50px;
+    width: 100px;
+    border-radius: 10px;
+}
+.btn-menu-page button:hover{
+    background-color: #9f97aec1;
+}

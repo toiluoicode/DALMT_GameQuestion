@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Khoot</title>
+    <!-- Thymeleaf sẽ tìm các file CSS trong thư mục resources/static -->
+    <link rel="stylesheet" th:href="@{/index.css}" />
+</head>
+<body>
+<div id="menu-page">
+    <h1 style="color: rgb(71, 183, 67); font-size: 50px;">Chào mừng bạn đến với Game Khoot</h1>
+    <div class="btn-menu-page">
+        <!-- Thymeleaf cung cấp cú pháp để thêm các thuộc tính thêm vào HTML -->
+        <button class="btn-create" >Create</button>
+        <button class="btn-join">Vào Phòng</button>
+    </div>
+</div>
+<script th:src="@{/app.js}"></script>
+</body>
+</html>
