@@ -8,9 +8,14 @@ body{
     text-align: center;
     justify-content: center;
     align-items: center;
-    text-align: center;
     background: linear-gradient(#F97794,#623AA2) no-repeat ;
     height: 100vh;
+}
+.hidden{
+    display: none;
+}
+#menu-page h1{
+    margin-bottom: 100px;
 }
 .btn-menu-page button{
     margin: 10px 20px;
