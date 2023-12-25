@@ -1,5 +1,7 @@
 package com.example.demo.Model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Cauhoi {
@@ -36,5 +38,12 @@ public class Cauhoi {
 
     public void setCorrectAnsser(int correctAnsser) {
         this.correctAnsser = correctAnsser;
+    }
+    public static List<Cauhoi> getListCauHoi (){
+        List<Cauhoi> ls = new ArrayList<>();
+        String content = "Thuận yêu ai nhất";
+        List<String> listAnser = new ArrayList<>(Arrays.asList("Mỹ Hạng","Bảo Hân","Như Quỳnh","Phụng"));
+        ls.add(new Cauhoi(content,listAnser,1));
+        return ls;
     }
 }

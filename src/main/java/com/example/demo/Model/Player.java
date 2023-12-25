@@ -6,6 +6,15 @@ public class Player {
     // o is No really, 1 is ready
     private boolean status;
 
+    public Player() {
+    }
+
+    public Player(String username) {
+
+
+        this.username = username;
+    }
+
     public Player(String username, int score, boolean status) {
         this.username = username;
         Score = score;

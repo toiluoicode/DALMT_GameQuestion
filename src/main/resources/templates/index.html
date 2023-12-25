@@ -15,9 +15,29 @@
     </div>
 </div>
 <div id="game-page" class="hidden">
-    <h1 style="color: rgb(71, 183, 67); font-size: 50px;">Chào mừng bạn đến với Game Khoot</h1>
-    <h3 class="username">abc</h3>
+   <div class="room-wait">
+       <h3 class="info-room">List Of Player: Room</h3>
+       <div class="list-player">
+           <ul class="list-player-room">
+
+           </ul>
+       </div>
+       <Button class="btn-play hidden">Play</Button>
+   </div>
+    <div class="room-play hidden">
+        <div class="room-play">
+            <h2 >Câu hỏi: A là người thuận yêu nhất</h2>
+            <ol>
+                <li ><strong>A</strong> Lựa chọn A</li>
+                <li ><strong>B</strong> Lựa chọn B</li>
+                <li ><strong>C</strong> Lựa chọn C</li>
+                <li ><strong>D</strong> Lựa chọn D</li>
+            </ol>
+            <div id="timer">Thời gian còn lại: <span id="countdown">10</span> giây</div>
+    </div>
 </div>
 <script type="text/javascript" th:src="@{/app.js}"></script>
+<script type="text/javascript" th:src="@{/sockjs.min.js}"></script>
+<script type="text/javascript" th:src="@{/stomp.min.js}"></script>
 </body>
 </html>
