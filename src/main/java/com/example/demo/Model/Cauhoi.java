@@ -42,8 +42,15 @@ public class Cauhoi {
     public static List<Cauhoi> getListCauHoi (){
         List<Cauhoi> ls = new ArrayList<>();
         String content = "Thuận yêu ai nhất";
-        List<String> listAnser = new ArrayList<>(Arrays.asList("Mỹ Hạng","Bảo Hân","Như Quỳnh","Phụng"));
+        List<String> listAnser = new ArrayList<>(Arrays.asList("Mỹ Hạnh","Bảo Hân","Như Quỳnh","Phụng"));
         ls.add(new Cauhoi(content,listAnser,1));
+        String content1 = "Thuận yêu ai nhất 1";
+        List<String> listAnser1 = new ArrayList<>(Arrays.asList("Mỹ Hạnh","Bảo Hân","Như Quỳnh","Phụng"));
+        ls.add(new Cauhoi(content1,listAnser1,1));
+
+        String content2 = "Thuận yêu ai nhất 2";
+        List<String> listAnser2 = new ArrayList<>(Arrays.asList("Mỹ Hạnh","Bảo Hân","Như Quỳnh","Phụng"));
+        ls.add(new Cauhoi(content2,listAnser2,1));
         return ls;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
@@ -24,6 +25,8 @@ public class GameController {
     private Map<String, Room> rooms =new HashMap<>();
     private List<Cauhoi> listQuestion = Cauhoi.getListCauHoi();
 
+    int couter = 0;
+    String ROOMID;
 
     @MessageMapping("/createRoom")
     @SendTo("/room/roomCreate")
@@ -38,6 +41,7 @@ public class GameController {
         room.addPlayer(player.getUsername());
 //        headerAccessor.getSessionAttributes().put("user", player.getUsername());
 //        headerAccessor.getSessionAttributes().put("RoomID", room.getRoomId());
+        ROOMID = room.getRoomId();
         rooms.put(room.getRoomId(),room);
         return room;
     }
@@ -55,5 +59,27 @@ public class GameController {
         template.convertAndSend("/room/"+ roomID,joinRoom);
         return joinRoom;
     }
+
+    @MessageMapping("/play/{roomID}")
+    public Cauhoi cauhoi (@DestinationVariable String roomID){
+        Cauhoi cauhoi = listQuestion.get(2);
+        System.out.println(couter);
+        String  repones = "Play";
+        Room roomInstain = rooms.get(roomID);
+        roomInstain.setStatusRoom("Play");
+        template.convertAndSend("/room/play/"+roomID,cauhoi);
+        couter++;
+        return cauhoi;
+    }
+//    @Scheduled(fixedDelay = 2000)
+//    public void PullQues (){
+//        if (rooms.get(ROOMID).getStatusRoom().equals("Play")) {
+//            if (couter < 0)
+//            {
+//                cauhoi(ROOMID);
+//            }
+//
+//        }
+//    }
 
 }

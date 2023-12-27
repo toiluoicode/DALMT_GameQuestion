@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var questionElement = document.querySelector('.room-play h2');
     var countdownElement = document.getElementById('countdown');
     var timerElement = document.getElementById('timer');
+    var question = document.querySelector(".question");
+    var listAnswer = document.querySelector(".list-anwser");
     let  countdown =10;
     var currrentPlayer = null
 
@@ -23,18 +25,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var RoomID = null;
 
     joinButton.addEventListener('click', function(){
-        var roomID = prompt("Nhập RoomID");
+        roomId = prompt("Nhập RoomID");
         username = prompt("Nhập tên");
         menuPage.classList.add("hidden");
 
-        if (roomID){
+        if (roomId){
             var socket = new SockJS("/ws")
             stompClient = Stomp.over(socket);
             console.log(socket);
             gamePage.classList.remove("hidden");
             roomWait.classList.remove("hidden");
             stompClient.connect({},function (){
-                stompClient.subscribe("/room/" + roomID,function (message){
+                stompClient.subscribe("/room/" + roomId,function (message){
                     var room= JSON.parse(message.body)
                     RoomID = room.roomId
                     var list = room.listplayer;
@@ -43,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     onConnect(username,RoomID)
 
                 })
-                stompClient.send('/app/joinRoom/'+ roomID,{},JSON.stringify(username));
+                stompClient.send('/app/joinRoom/'+ roomId,{},JSON.stringify(username));
             });
         } else {
             alert("Bạn đã hủy nhập phòng");
@@ -65,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 stompClient.subscribe('/room/roomCreate', function (message) {
                     console.log("Received message: " + message.body);
                     var room = JSON.parse(message.body);
-                    RoomID = room.roomId;
+                    roomId = room.roomId;
                     updatelist(room.listplayer)
-                    onConnect(username,RoomID);
-                    roomInf.innerHTML = "List Of Player Of Room: " + RoomID;
+                    onConnect(username,roomId);
+                    roomInf.innerHTML = "List Of Player Of Room: " + roomId;
                     if (room.listplayer.length > 0 && username == room.listplayer[0].username){
                         console.log(room.listplayer[0].username)
                         play_button.classList.remove("hidden");
@@ -81,11 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }, true);
-    play_button.addEventListener('click',function (){
-        roomWait.classList.add('hidden')
-        roomPlay.classList.remove('hidden')
-        startCountdown();
-    });
+
     function onConnect (name , roomInfo){
         stompClient.subscribe('/room/' + roomInfo , function (res){
             var room = JSON.parse(res.body)
@@ -93,7 +91,50 @@ document.addEventListener('DOMContentLoaded', function () {
             updatelist(room.listplayer)
             currrentPlayer = room.listplayer.length -1
         })
+        play_button.addEventListener('click',function (){
+            stompClient.send('/app/play/'+ roomInfo)
 
+        });
+        stompClient.subscribe('/room/play/' + roomInfo, function (message){
+            var question = JSON.parse(message.body);
+            console.log(question);
+            roomWait.classList.add('hidden')
+            roomPlay.classList.remove('hidden')
+            pullQuestion(question.content,question.answer);
+
+        })
+
+    }
+    function pullQuestion (Question, anwser){
+        listAnswer.innerHTML="";
+        question.innerHTML= Question;
+        anwser.forEach(function (choice ,index){
+            var  li = document.createElement("li");
+            li.innerHTML = `<strong>${String.fromCharCode(65 + index)}</strong> ${choice}`;
+            listAnswer.appendChild(li);
+        })
+        answerItems = document.querySelectorAll('.room-play li');
+        answerItems.forEach(function (item) {
+
+            item.addEventListener('click', function () {
+
+                const isSelected = item.classList.contains('selected');
+                if (!isSelected) {
+                    answerItems.forEach(function (otherItem) {
+                        otherItem.classList.remove('selected');
+                    });
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        });
+        questionElement.addEventListener('click', function () {
+            answerItems.forEach(function (item) {
+                item.classList.remove('selected');
+            });
+        });
+        startCountdown()
     }
     function  updatelist (listPlayer){
         listPlayerRoom.innerHTML=""
@@ -103,26 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
             listPlayerRoom.appendChild(li)
         })
     }
-    answerItems.forEach(function (item) {
-        item.addEventListener('click', function () {
-            const isSelected = item.classList.contains('selected');
-            if (!isSelected) {
-                answerItems.forEach(function (otherItem) {
-                    otherItem.classList.remove('selected');
-                });
-                item.classList.add('selected');
-            } else {
-                item.classList.remove('selected');
-            }
-        });
-    });
-
-    questionElement.addEventListener('click', function () {
-        answerItems.forEach(function (item) {
-            item.classList.remove('selected');
-        });
-    });
-
     function startCountdown() {
         const countdownInterval = setInterval(function () {
             countdown--;
