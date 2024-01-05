@@ -71,27 +71,34 @@ public class GameController {
         roomInstain.setStatusRoom("Play");
         template.convertAndSend("/room/play/"+roomID,repones);
         countDown(roomInstain.getRoomId());
-        couter++;
     }
 
     public void countDown(String roomId)
     {
-        String  repones = "Play 1";
+
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
-            int time = 10;
+            int time = -1;
 
             @Override
             public void run() {
                 if (time < 0)
                 {
+
+                    Cauhoi cauhoi = listQuestion.get(couter);
+                    template.convertAndSend("/room/question/"+roomId,cauhoi);
                     time = 10;
-                    // đổ câu hỏi
+                    if (couter <= 3)
+                    {
+                     couter++;
+                    }
+
                 }
                 else{
                     template.convertAndSend("/room/time/"+roomId,time);
                     time--;
                 }
+
             }
 
 

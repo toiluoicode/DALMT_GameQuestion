@@ -103,6 +103,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     countdownElement.innerHTML = "Het";
                 }
             });
+            stompClient.subscribe("/room/question/"+roomInfo,function (message){
+                var cauhoi = JSON.parse(message.body)
+                console.log(" đổ câu hỏi")
+                pullQuestion(cauhoi.content,cauhoi.answer)
+            });
 
 
         });
