@@ -10,12 +10,11 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class GameController {
@@ -29,7 +28,7 @@ public class GameController {
     String ROOMID;
 
     @MessageMapping("/createRoom")
-    @SendTo("/room/roomCreate")
+    @SendToUser("/room/roomCreate")
     public Room createRoom (@Payload Player player, SimpMessageHeaderAccessor headerAccessor){
         Room room = new Room();
 
@@ -39,7 +38,7 @@ public class GameController {
         String s = "kết nối thành công";
         headerAccessor.getSessionAttributes().put("Notification", s);
         room.addPlayer(player.getUsername());
-//        headerAccessor.getSessionAttributes().put("user", player.getUsername());
+        headerAccessor.getSessionAttributes().put("user", player.getUsername());
 //        headerAccessor.getSessionAttributes().put("RoomID", room.getRoomId());
         ROOMID = room.getRoomId();
         rooms.put(room.getRoomId(),room);
@@ -51,6 +50,10 @@ public class GameController {
         Room joinRoom = rooms.get(roomID);
         System.out.println("Vao joinRoom " + roomID);
         System.out.println(joinRoom.getRoomId());
+//        if (joinRoom.getStatusRoom().equals("play"))
+//        {
+//            j\
+//        }
         joinRoom.addPlayer(player.getUsername());
         for (Player currentPlayer : joinRoom.getListplayer())
         {
@@ -61,25 +64,39 @@ public class GameController {
     }
 
     @MessageMapping("/play/{roomID}")
-    public Cauhoi cauhoi (@DestinationVariable String roomID){
-        Cauhoi cauhoi = listQuestion.get(2);
-        System.out.println(couter);
+    public void cauhoi (@DestinationVariable String roomID){
         String  repones = "Play";
         Room roomInstain = rooms.get(roomID);
         roomInstain.setStatusRoom("Play");
-        template.convertAndSend("/room/play/"+roomID,cauhoi);
+        template.convertAndSend("/room/play/"+roomID,repones);
+        countDown(roomInstain);
         couter++;
-        return cauhoi;
     }
-//    @Scheduled(fixedDelay = 2000)
-//    public void PullQues (){
-//        if (rooms.get(ROOMID).getStatusRoom().equals("Play")) {
-//            if (couter < 0)
-//            {
-//                cauhoi(ROOMID);
-//            }
-//
-//        }
-//    }
+    public void countDown(Room room)
+    {
+        System.out.println("vào hàm ày");
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            int time = 10;
+            @Override
+            public void run() {
+                if (time < 0)
+                {
+                    time = 10;
+                    // đổ câu hỏi
+                }
+                else{
+                    System.out.println(room.getRoomId());
+                    // đếm thời giang
+                    template.convertAndSend("/countdown/time/" + room.getRoomId(),time);
+                    time--;
+                    System.out.println(time);
+                }
+            }
+
+
+        };
+        timer.scheduleAtFixedRate(task,0,1000);
+    }
 
 }

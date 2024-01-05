@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
             stompClient.connect({}, function (frame) {
 
                 console.log("vào đây 2");
-                stompClient.subscribe('/room/roomCreate', function (message) {
+                stompClient.subscribe('/user/room/roomCreate', function (message) {
                     console.log("Received message: " + message.body);
                     var room = JSON.parse(message.body);
                     roomId = room.roomId;
@@ -96,13 +96,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         });
         stompClient.subscribe('/room/play/' + roomInfo, function (message){
-            var question = JSON.parse(message.body);
+            // var question = JSON.parse(message.body);
             console.log(question);
             roomWait.classList.add('hidden')
             roomPlay.classList.remove('hidden')
-            pullQuestion(question.content,question.answer);
+            // pullQuestion(question.content,question.answer);
 
-        })
+        });
+        console.log("nghe"+roomInfo);
+        stompClient.subscribe("/countdown/time/"+roomInfo,function (message){
+
+            console.log("vào hàm này")
+           var timer = JSON.parse(message.body)
+            timerElement.innerHTML = timer;
+           if (timer < 0 )
+           {
+               timerElement.innerHTML = "Het";
+           }
+        });
 
     }
     function pullQuestion (Question, anwser){
@@ -134,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.classList.remove('selected');
             });
         });
-        startCountdown()
+        // startCountdown()
     }
     function  updatelist (listPlayer){
         listPlayerRoom.innerHTML=""
@@ -144,15 +155,15 @@ document.addEventListener('DOMContentLoaded', function () {
             listPlayerRoom.appendChild(li)
         })
     }
-    function startCountdown() {
-        const countdownInterval = setInterval(function () {
-            countdown--;
-            countdownElement.textContent = countdown;
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                timerElement.textContent = "Hết thời gian!";
-            }
-        }, 1000);
-    }
+    // function startCountdown() {
+    //     const countdownInterval = setInterval(function () {
+    //         countdown--;
+    //         countdownElement.textContent = countdown;
+    //         if (countdown <= 0) {
+    //             clearInterval(countdownInterval);
+    //             timerElement.textContent = "Hết thời gian!";
+    //         }
+    //     }, 1000);
+    // }
 
 });
