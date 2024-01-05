@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Cauhoi;
 import com.example.demo.Model.Player;
 import com.example.demo.Model.Room;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -69,15 +70,17 @@ public class GameController {
         Room roomInstain = rooms.get(roomID);
         roomInstain.setStatusRoom("Play");
         template.convertAndSend("/room/play/"+roomID,repones);
-        countDown(roomInstain);
+        countDown(roomInstain.getRoomId());
         couter++;
     }
-    public void countDown(Room room)
+
+    public void countDown(String roomId)
     {
-        System.out.println("vào hàm ày");
+        String  repones = "Play";
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             int time = 10;
+
             @Override
             public void run() {
                 if (time < 0)
@@ -86,11 +89,8 @@ public class GameController {
                     // đổ câu hỏi
                 }
                 else{
-                    System.out.println(room.getRoomId());
-                    // đếm thời giang
-                    template.convertAndSend("/countdown/time/" + room.getRoomId(),time);
+                    template.convertAndSend("/room/time/"+roomId,time);
                     time--;
-                    System.out.println(time);
                 }
             }
 

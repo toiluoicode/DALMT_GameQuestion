@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     roomInf.innerHTML = "List Of Player Of Room: " + RoomID;
                     updatelist(list)
                     onConnect(username,RoomID)
-
                 })
                 stompClient.send('/app/joinRoom/'+ roomId,{},JSON.stringify(username));
             });
@@ -57,15 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
         menuPage.classList.add("hidden");
         gamePage.classList.remove("hidden");
         if (username) {
-            console.log("vào đây 1");
              var socket = new SockJS("/ws");
             stompClient = Stomp.over(socket);
-            console.log(socket);
             stompClient.connect({}, function (frame) {
-
-                console.log("vào đây 2");
                 stompClient.subscribe('/user/room/roomCreate', function (message) {
-                    console.log("Received message: " + message.body);
                     var room = JSON.parse(message.body);
                     roomId = room.roomId;
                     updatelist(room.listplayer)
@@ -97,22 +91,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         stompClient.subscribe('/room/play/' + roomInfo, function (message){
             // var question = JSON.parse(message.body);
-            console.log(question);
             roomWait.classList.add('hidden')
             roomPlay.classList.remove('hidden')
-            // pullQuestion(question.content,question.answer);
+            console.log("vào hàm này")
+            stompClient.subscribe('/room/time/'+roomInfo,function (message){
+                console.log("vào hàm này")
+                var timer = JSON.parse(message.body)
+                 countdownElement.innerHTML = timer;
+                if (timer < 0 )
+                {
+                    countdownElement.innerHTML = "Het";
+                }
+            });
+
 
         });
-        console.log("nghe"+roomInfo);
-        stompClient.subscribe("/countdown/time/"+roomInfo,function (message){
-
+        stompClient.subscribe('/room/time/'+roomInfo,function (message){
             console.log("vào hàm này")
-           var timer = JSON.parse(message.body)
-            timerElement.innerHTML = timer;
-           if (timer < 0 )
-           {
-               timerElement.innerHTML = "Het";
-           }
+           // var timer = JSON.parse(message.body)
+           //  countdownElement.innerHTML = timer;
+           // if (timer < 0 )
+           // {
+           //     countdownElement.innerHTML = "Het";
+           // }
         });
 
     }
