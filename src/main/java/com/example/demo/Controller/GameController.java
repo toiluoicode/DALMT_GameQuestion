@@ -76,7 +76,7 @@ public class GameController {
 
     public void countDown(String roomId)
     {
-        String  repones = "Play";
+        String  repones = "Play 1";
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             int time = 10;
