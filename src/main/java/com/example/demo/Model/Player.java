@@ -3,12 +3,10 @@ package com.example.demo.Model;
 public class Player {
     private String username;
     private int Score;
-    // o is No really, 1 is ready
     private boolean status;
 
     public Player() {
     }
-
     public Player(String username) {
 
 

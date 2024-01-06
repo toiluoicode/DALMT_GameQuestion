@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var timerElement = document.getElementById('timer');
     var question = document.querySelector(".question");
     var listAnswer = document.querySelector(".list-anwser");
+    var ratingPage = document.getElementById("Rating-page")
     let  countdown =10;
-    var currrentPlayer = null
+    // var currrentPlayer = null
 
     var username = null;
     var RoomID = null;
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
         roomId = prompt("Nhập RoomID");
         username = prompt("Nhập tên");
         menuPage.classList.add("hidden");
-
         if (roomId){
             var socket = new SockJS("/ws")
             stompClient = Stomp.over(socket);
@@ -71,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }else{
                         play_button.classList.add("hidden")
                     }
-
                 });
                 stompClient.send('/app/createRoom',{},JSON.stringify(username))
             });
@@ -83,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var room = JSON.parse(res.body)
 
             updatelist(room.listplayer)
-            currrentPlayer = room.listplayer.length -1
         })
         play_button.addEventListener('click',function (){
             stompClient.send('/app/play/'+ roomInfo)
@@ -94,33 +92,27 @@ document.addEventListener('DOMContentLoaded', function () {
             roomWait.classList.add('hidden')
             roomPlay.classList.remove('hidden')
             console.log("vào hàm này")
-            stompClient.subscribe('/room/time/'+roomInfo,function (message){
-                console.log("vào hàm này")
-                var timer = JSON.parse(message.body)
-                 countdownElement.innerHTML = timer;
-                if (timer < 0 )
-                {
-                    countdownElement.innerHTML = "Het";
-                }
-            });
-            stompClient.subscribe("/room/question/"+roomInfo,function (message){
-                var cauhoi = JSON.parse(message.body)
-                console.log(" đổ câu hỏi")
-                pullQuestion(cauhoi.content,cauhoi.answer)
-            });
+
 
 
         });
         stompClient.subscribe('/room/time/'+roomInfo,function (message){
-            console.log("vào hàm này")
-           // var timer = JSON.parse(message.body)
-           //  countdownElement.innerHTML = timer;
-           // if (timer < 0 )
-           // {
-           //     countdownElement.innerHTML = "Het";
-           // }
-        });
+            var timer = JSON.parse(message.body)
+            countdownElement.innerHTML = timer;
+            if (timer < 0 )
+            {
+                countdownElement.innerHTML = "Het";
 
+            }
+        });
+        stompClient.subscribe("/room/question/"+roomInfo,function (message){
+            var cauhoi = JSON.parse(message.body)
+            pullQuestion(cauhoi.content,cauhoi.answer)
+        });
+        stompClient.subscribe("/room/rating/"+roomInfo,function (message){
+                ratingPage.classList.remove("hidden")
+                gamePage.classList.add("hidden")
+        })
     }
     function pullQuestion (Question, anwser){
         listAnswer.innerHTML="";
@@ -161,15 +153,4 @@ document.addEventListener('DOMContentLoaded', function () {
             listPlayerRoom.appendChild(li)
         })
     }
-    // function startCountdown() {
-    //     const countdownInterval = setInterval(function () {
-    //         countdown--;
-    //         countdownElement.textContent = countdown;
-    //         if (countdown <= 0) {
-    //             clearInterval(countdownInterval);
-    //             timerElement.textContent = "Hết thời gian!";
-    //         }
-    //     }, 1000);
-    // }
-
 });

@@ -22,12 +22,8 @@ public class GameController {
 
     @Autowired
     public SimpMessagingTemplate template;
-    private Map<String, Room> rooms =new HashMap<>();
-    private List<Cauhoi> listQuestion = Cauhoi.getListCauHoi();
-
-    int couter = 0;
-    String ROOMID;
-
+    private final Map<String, Room> rooms =new HashMap<>();
+    private final List<Cauhoi> listQuestion = Cauhoi.getListCauHoi();
     @MessageMapping("/createRoom")
     @SendToUser("/room/roomCreate")
     public Room createRoom (@Payload Player player, SimpMessageHeaderAccessor headerAccessor){
@@ -40,8 +36,8 @@ public class GameController {
         headerAccessor.getSessionAttributes().put("Notification", s);
         room.addPlayer(player.getUsername());
         headerAccessor.getSessionAttributes().put("user", player.getUsername());
-//        headerAccessor.getSessionAttributes().put("RoomID", room.getRoomId());
-        ROOMID = room.getRoomId();
+//       headerAccessor.getSessionAttributes().put("RoomID", room.getRoomId());
+//        ROOMID = room.getRoomId();
         rooms.put(room.getRoomId(),room);
         return room;
     }
@@ -51,15 +47,7 @@ public class GameController {
         Room joinRoom = rooms.get(roomID);
         System.out.println("Vao joinRoom " + roomID);
         System.out.println(joinRoom.getRoomId());
-//        if (joinRoom.getStatusRoom().equals("play"))
-//        {
-//            j\
-//        }
         joinRoom.addPlayer(player.getUsername());
-        for (Player currentPlayer : joinRoom.getListplayer())
-        {
-            System.out.println(currentPlayer.getUsername());
-        }
         template.convertAndSend("/room/"+ roomID,joinRoom);
         return joinRoom;
     }
@@ -70,38 +58,39 @@ public class GameController {
         Room roomInstain = rooms.get(roomID);
         roomInstain.setStatusRoom("Play");
         template.convertAndSend("/room/play/"+roomID,repones);
-        countDown(roomInstain.getRoomId());
+        countDown(roomInstain);
     }
-
-    public void countDown(String roomId)
+    public void countDown(Room room)
     {
 
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             int time = -1;
-
+            int couter = 0; 
             @Override
             public void run() {
-                if (time < 0)
-                {
-
-                    Cauhoi cauhoi = listQuestion.get(couter);
-                    template.convertAndSend("/room/question/"+roomId,cauhoi);
-                    time = 10;
-                    if (couter <= 3)
-                    {
-                     couter++;
-                    }
-
-                }
-                else{
-                    template.convertAndSend("/room/time/"+roomId,time);
-                    time--;
-                }
-
+               if (couter <= listQuestion.size()-1 )
+               {
+                   if (time < 0)
+                   {
+                       Cauhoi cauhoi = listQuestion.get(couter);
+                       template.convertAndSend("/room/question/"+room.getRoomId(),cauhoi);
+                       time = 10;
+                       couter++;
+                   }
+                   else{
+                       template.convertAndSend("/room/time/"+room.getRoomId(),time);
+                       time--;
+                   }
+               }
+               else {
+                   timer.cancel();
+                   room.setStatusRoom("Rating");
+                  String S = room.getStatusRoom();
+                   template.convertAndSend("/room/rating/"+room.getRoomId(),S);
+                   cancel();
+               }
             }
-
-
         };
         timer.scheduleAtFixedRate(task,0,1000);
     }
