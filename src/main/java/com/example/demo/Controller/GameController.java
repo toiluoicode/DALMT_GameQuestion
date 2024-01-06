@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.Cauhoi;
+import com.example.demo.Model.CauhoiClient;
 import com.example.demo.Model.Player;
 import com.example.demo.Model.Room;
 import lombok.SneakyThrows;
@@ -66,7 +67,7 @@ public class GameController {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             int time = -1;
-            int couter = 0; 
+            int couter = 0;
             @Override
             public void run() {
                if (couter <= listQuestion.size()-1 )
@@ -74,9 +75,16 @@ public class GameController {
                    if (time < 0)
                    {
                        Cauhoi cauhoi = listQuestion.get(couter);
-                       template.convertAndSend("/room/question/"+room.getRoomId(),cauhoi);
-                       time = 10;
-                       couter++;
+                       CauhoiClient cauhoiClient = new CauhoiClient(couter,cauhoi.getContent(),cauhoi.getAnswer());
+                       try{
+                           template.convertAndSend("/room/question/"+room.getRoomId(),cauhoiClient);
+                           time = 10;
+                           couter++;
+                       }catch (Exception e)
+                       {
+                           e.printStackTrace();
+                       }
+
                    }
                    else{
                        template.convertAndSend("/room/time/"+room.getRoomId(),time);
