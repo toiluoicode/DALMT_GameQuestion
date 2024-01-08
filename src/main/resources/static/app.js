@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     var stompClient = null
     var joinButton = document.querySelector('.btn-join');
@@ -19,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var question = document.querySelector(".question");
     var listAnswer = document.querySelector(".list-anwser");
     var ratingPage = document.getElementById("Rating-page")
-    let  countdown =10;
+    var idquestion;
+
     // var currrentPlayer = null
 
     var username = null;
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     joinButton.addEventListener('click', function(){
         roomId = prompt("Nhập RoomID");
         username = prompt("Nhập tên");
+        user = username
         menuPage.classList.add("hidden");
         if (roomId){
             var socket = new SockJS("/ws")
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     createRoomButton.addEventListener('click', function (){
         username = prompt("Nhập tên");
+        user = username;
         menuPage.classList.add("hidden");
         gamePage.classList.remove("hidden");
         if (username) {
@@ -88,30 +90,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
         });
         stompClient.subscribe('/room/play/' + roomInfo, function (message){
-            // var question = JSON.parse(message.body);
             roomWait.classList.add('hidden')
             roomPlay.classList.remove('hidden')
             console.log("vào hàm này")
-
-
-
         });
         stompClient.subscribe('/room/time/'+roomInfo,function (message){
             var timer = JSON.parse(message.body)
             countdownElement.innerHTML = timer;
-            if (timer < 0 )
+            if (timer == 0 )
             {
                 countdownElement.innerHTML = "Het";
-
+                // sendAnswerTosever()
+                var dataTosend ={
+                    idquestion : idquestion,
+                    anwser: getSelectedAnswerIndex(),
+                    username : name
+                };
+                stompClient.send("/app/sendAnswer/"+roomInfo,{},JSON.stringify(dataTosend))
             }
         });
         stompClient.subscribe("/room/question/"+roomInfo,function (message){
             var cauhoi = JSON.parse(message.body)
+            idquestion = cauhoi.idQuestion;
             pullQuestion(cauhoi.content,cauhoi.answer)
         });
         stompClient.subscribe("/room/rating/"+roomInfo,function (message){
                 ratingPage.classList.remove("hidden")
                 gamePage.classList.add("hidden")
+                var listPlayer = JSON.parse(message.body)
+                generateRankingUI(listPlayer);
         })
     }
     function pullQuestion (Question, anwser){
@@ -143,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.classList.remove('selected');
             });
         });
-        // startCountdown()
     }
     function  updatelist (listPlayer){
         listPlayerRoom.innerHTML=""
@@ -153,4 +159,41 @@ document.addEventListener('DOMContentLoaded', function () {
             listPlayerRoom.appendChild(li)
         })
     }
+    function getSelectedAnswerIndex() {
+        var selectedAnswer = null;
+
+
+        answerItems.forEach(function (item, index) {
+            if (item.classList.contains('selected')) {
+                selectedAnswer = index;
+            }
+        });
+
+
+        if (selectedAnswer !== null) {
+            return selectedAnswer;
+        } else {
+            return -1;
+        }
+    }
+    function generateRankingUI(data) {
+        // Sort the data based on score in descending order
+        const sortedData = data.sort((a, b) => b.score - a.score);
+
+        const rankingContainer = document.getElementById('rankingContainer');
+        rankingContainer.innerHTML = '';
+        sortedData.forEach(item => {
+            const rankingItem = document.createElement('div');
+            rankingItem.className = 'ranking-item';
+
+            rankingItem.innerHTML = `
+                    <span class="username">${item.username}</span>
+                    <span class="score">${item.score}</span>
+                `;
+
+            rankingContainer.appendChild(rankingItem);
+        });
+    }
+
+
 });

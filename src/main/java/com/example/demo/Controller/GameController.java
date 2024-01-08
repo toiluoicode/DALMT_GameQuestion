@@ -1,9 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.Cauhoi;
-import com.example.demo.Model.CauhoiClient;
-import com.example.demo.Model.Player;
-import com.example.demo.Model.Room;
+import com.example.demo.Model.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -68,23 +65,19 @@ public class GameController {
         TimerTask task = new TimerTask() {
             int time = -1;
             int couter = 0;
+
             @Override
             public void run() {
                if (couter <= listQuestion.size()-1 )
                {
+
                    if (time < 0)
                    {
                        Cauhoi cauhoi = listQuestion.get(couter);
                        CauhoiClient cauhoiClient = new CauhoiClient(couter,cauhoi.getContent(),cauhoi.getAnswer());
-                       try{
-                           template.convertAndSend("/room/question/"+room.getRoomId(),cauhoiClient);
-                           time = 10;
-                           couter++;
-                       }catch (Exception e)
-                       {
-                           e.printStackTrace();
-                       }
-
+                       template.convertAndSend("/room/question/"+room.getRoomId(),cauhoiClient);
+                       time = 2;
+                       couter++;
                    }
                    else{
                        template.convertAndSend("/room/time/"+room.getRoomId(),time);
@@ -95,12 +88,32 @@ public class GameController {
                    timer.cancel();
                    room.setStatusRoom("Rating");
                   String S = room.getStatusRoom();
-                   template.convertAndSend("/room/rating/"+room.getRoomId(),S);
+                   template.convertAndSend("/room/rating/"+room.getRoomId(),room.getListplayer());
                    cancel();
                }
             }
         };
         timer.scheduleAtFixedRate(task,0,1000);
     }
+    @MessageMapping("/sendAnswer/{roomID}")
+    public void checkAnwser (@DestinationVariable String roomID, @Payload RequestClient requestClient)
+    {
+        Room room = rooms.get(roomID);
+        Player player = new Player(requestClient.getUsername());
+        for (Player currentPlayer : room.getListplayer())
+        {
+            if (currentPlayer.getUsername().equals(player.getUsername())){
+               if (listQuestion.get(requestClient.getIdquestion()).getCorrectAnsser() == requestClient.getAnwser())
+               {
+                   currentPlayer.setScore(currentPlayer.getScore()+1);
+                   System.out.println(currentPlayer.getUsername() +" có "+currentPlayer.getScore());
+               }
+            }
+        }
+
+
+
+    }
+
 
 }

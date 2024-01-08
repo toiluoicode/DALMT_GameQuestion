@@ -146,3 +146,36 @@ body{
     font-size: 18px;
 }
 
+/*Rating */
+.ranking-container {
+    max-width: 400px;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ranking-item {
+    display: flex;
+    justify-content: space-between; /* Align items to each end */
+    align-items: center; /* Center items vertically */
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Separate styles for username and score */
+.ranking-item .username {
+    font-weight: bold;
+    margin-bottom: 5px;
+    padding-right: 300px;
+}
+
+.ranking-item .status {
+    color: #d9534f; /* Red color for inactive status */
+}
+
+.ranking-item .score {
+    color: #28a745;
+}

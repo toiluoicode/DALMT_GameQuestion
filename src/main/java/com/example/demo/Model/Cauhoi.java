@@ -10,6 +10,9 @@ public class Cauhoi {
 
     private int correctAnsser;
 
+    public Cauhoi() {
+    }
+
     public Cauhoi(String content, List<String> answer, int correctAnsser) {
         this.content = content;
         this.answer = answer;
